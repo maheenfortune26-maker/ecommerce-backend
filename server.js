@@ -41,18 +41,19 @@ app.use("*", (req, res) => {
 // ─── Centralized Error Handler (must be last) ────────────────────────────────
 app.use(errorMiddleware);
 
+// ─── Start Server (local only) ───────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-// ADD this instead:
+
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on http://localhost:${PORT} [${process.env.NODE_ENV}]`);
   });
 }
 
-module.exports = app;
-
-// Handle unhandled promise rejections (e.g. DB connection failure after start)
+// Handle unhandled promise rejections
 process.on("unhandledRejection", (err) => {
   console.error(`❌ Unhandled Rejection: ${err.message}`);
-  server.close(() => process.exit(1));
+  process.exit(1);
 });
+
+module.exports = app;
