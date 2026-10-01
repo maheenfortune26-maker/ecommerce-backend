@@ -42,9 +42,14 @@ app.use("*", (req, res) => {
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT} [${process.env.NODE_ENV}]`);
-});
+// ADD this instead:
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT} [${process.env.NODE_ENV}]`);
+  });
+}
+
+module.exports = app;
 
 // Handle unhandled promise rejections (e.g. DB connection failure after start)
 process.on("unhandledRejection", (err) => {
