@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 const connectDB = require("./config/database");
 const { errorMiddleware } = require("./middleware/errorHandler");
 
@@ -16,6 +17,9 @@ const app = express();
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// ─── Serve Frontend ──────────────────────────────────────────────────────────
+app.use(express.static(path.join(__dirname, "public")));
 
 // ─── API Routes ─────────────────────────────────────────────────────────────
 app.use("/api/v1/auth", require("./routes/authRoutes"));
@@ -33,9 +37,12 @@ app.get("/api/v1/health", (req, res) => {
   });
 });
 
-// 404 handler — catch unmatched routes
-app.use("*", (req, res) => {
-  res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+// ─── SPA Fallback ────────────────────────────────────────────────────────────
+app.get("*", (req, res) => {
+  if (req.originalUrl.startsWith("/api")) {
+    return res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
+  }
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // ─── Centralized Error Handler (must be last) ────────────────────────────────
