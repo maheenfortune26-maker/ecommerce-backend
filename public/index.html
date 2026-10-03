@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shoply — Modern Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── NAVBAR ─────────────────────────────────────────────── -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo" onclick="showPage('home')">Shoply</a>
+      <div class="nav-links" id="navLinks">
+        <a href="#" onclick="showPage('home')">Shop</a>
+        <a href="#" onclick="requireAuth('orders')">Orders</a>
+        <a href="#" onclick="requireAuth('cart')" class="cart-link">
+          Cart <span class="badge" id="cartBadge">0</span>
+        </a>
+      </div>
+      <div class="nav-right">
+        <div id="navAuth">
+          <button class="btn-ghost" onclick="showPage('login')">Sign in</button>
+          <button class="btn-primary" onclick="showPage('register')">Register</button>
+        </div>
+        <div id="navUser" style="display:none">
+          <span class="user-greeting" id="userGreeting"></span>
+          <button class="btn-ghost" onclick="logout()">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── TOAST ──────────────────────────────────────────────── -->
+  <div id="toast"></div>
+
+  <!-- ── PAGES ─────────────────────────────────────────────── -->
+
+  <!-- HOME / SHOP -->
+  <div id="page-home" class="page active">
+    <section class="hero">
+      <div class="hero-text">
+        <p class="hero-eyebrow">New arrivals every week</p>
+        <h1>The things you<br/><em>actually</em> want.</h1>
+        <p class="hero-sub">Electronics, Clothing, Books, Sports & more — curated, not collected.</p>
+        <button class="btn-primary btn-large" onclick="document.getElementById('products-section').scrollIntoView({behavior:'smooth'})">Browse now</button>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <div class="hero-card-inner">
+            <span class="tag">Top Pick</span>
+            <div class="hero-placeholder-img">🛍️</div>
+            <p class="hero-card-name">Explore the collection</p>
+            <p class="hero-card-price">Starting from $9.99</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="products-section" class="products-section">
+      <div class="section-header">
+        <h2>All Products</h2>
+        <div class="filters">
+          <select id="categoryFilter" onchange="filterProducts()">
+            <option value="">All Categories</option>
+            <option>Electronics</option>
+            <option>Clothing</option>
+            <option>Books</option>
+            <option>Home & Garden</option>
+            <option>Sports</option>
+            <option>Toys</option>
+            <option>Beauty</option>
+            <option>Other</option>
+          </select>
+          <select id="sortFilter" onchange="filterProducts()">
+            <option value="">Sort by</option>
+            <option value="price-asc">Price: Low → High</option>
+            <option value="price-desc">Price: High → Low</option>
+            <option value="rating">Top Rated</option>
+          </select>
+          <input type="text" id="searchInput" placeholder="Search products…" oninput="filterProducts()" />
+        </div>
+      </div>
+      <div class="products-grid" id="productsGrid">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading products…</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- PRODUCT DETAIL -->
+  <div id="page-product" class="page">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('home')">← Back to shop</button>
+      <div id="productDetail"></div>
+    </div>
+  </div>
+
+  <!-- CART -->
+  <div id="page-cart" class="page">
+    <div class="container">
+      <h2 class="page-title">Your Cart</h2>
+      <div id="cartContent"></div>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div id="page-orders" class="page">
+    <div class="container">
+      <h2 class="page-title">My Orders</h2>
+      <div id="ordersContent"></div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="page-login" class="page">
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <h2>Welcome back</h2>
+        <p class="auth-sub">Sign in to your account</p>
+        <div id="loginError" class="form-error" style="display:none"></div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="loginPassword" placeholder="Your password" />
+            <button class="pw-toggle" onclick="togglePw('loginPassword', this)">Show</button>
+          </div>
+        </div>
+        <button class="btn-primary full-width" onclick="login()">Sign in</button>
+        <p class="auth-switch">No account? <a href="#" onclick="showPage('register')">Register here</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="page-register" class="page">
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <h2>Create account</h2>
+        <p class="auth-sub">Join Shoply today</p>
+        <div id="registerError" class="form-error" style="display:none"></div>
+        <div class="form-group">
+          <label>Full name</label>
+          <input type="text" id="regName" placeholder="Your name" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="regEmail" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="regPassword" placeholder="Min. 8 characters" />
+            <button class="pw-toggle" onclick="togglePw('regPassword', this)">Show</button>
+          </div>
+        </div>
+        <button class="btn-primary full-width" onclick="register()">Create account</button>
+        <p class="auth-switch">Already have an account? <a href="#" onclick="showPage('login')">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT -->
+  <div id="page-checkout" class="page">
+    <div class="container">
+      <button class="back-btn" onclick="showPage('cart')">← Back to cart</button>
+      <h2 class="page-title">Checkout</h2>
+      <div class="checkout-layout">
+        <div class="checkout-form">
+          <h3>Shipping Info</h3>
+          <div id="checkoutError" class="form-error" style="display:none"></div>
+          <div class="form-group"><label>Address</label><input type="text" id="coAddress" placeholder="123 Main St" /></div>
+          <div class="form-row">
+            <div class="form-group"><label>City</label><input type="text" id="coCity" placeholder="Islamabad" /></div>
+            <div class="form-group"><label>Postal Code</label><input type="text" id="coPostal" placeholder="44000" /></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Country</label><input type="text" id="coCountry" placeholder="Pakistan" /></div>
+            <div class="form-group"><label>Phone</label><input type="text" id="coPhone" placeholder="03001234567" /></div>
+          </div>
+          <h3 style="margin-top:2rem">Payment</h3>
+          <div class="payment-options">
+            <label class="radio-card">
+              <input type="radio" name="payment" value="cod" checked />
+              <span>Cash on Delivery</span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="payment" value="card" />
+              <span>Card (simulated)</span>
+            </label>
+          </div>
+        </div>
+        <div class="checkout-summary" id="checkoutSummary"></div>
+      </div>
+      <button class="btn-primary btn-large" onclick="placeOrder()" style="margin-top:2rem">Place Order</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
